@@ -51,7 +51,7 @@ class Employee:
 
     @department_id.setter
     def department_id(self, department_id):
-        if type(department_id) is int and Department.find_by_id(department_id):
+        if isinstance(department_id, int) and Department.find_by_id(department_id):
             self._department_id = department_id
         else:
             raise ValueError(
@@ -187,4 +187,14 @@ class Employee:
 
     def reviews(self):
         """Return list of reviews associated with current employee"""
-        pass
+        from review import Review
+        sql = """
+            SELECT * FROM reviews
+            WHERE employee_id = ?
+        """
+        CURSOR.execute(sql, (self.id,),)
+
+        rows = CURSOR.fetchall()
+        return [
+            Review.instance_from_db(row) for row in rows
+        ]
